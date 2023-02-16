@@ -287,22 +287,62 @@ def detailOdp(request, odp):
 
 @api_view(['POST'])
 def addTestV(request):
-    result = json.loads(request.body)
-    serializer = TestSerializer(data=result)
-    if serializer.is_valid():
-        serializer.save()
-    test = Test.objects.latest('id')
-    for nr, tr, zam in zip(result.get('numerP'),result.get('trescPyt'),result.get('zamkniete')):
-        if Pytanie.objects.filter(test=test.id, numer=nr):
-            continue
-        Pytanie.objects.create(numer=nr, tresc=tr, zamkniete=zam, test=test)
-    if result.get('poprawna', False):
-        for nr, tr, pop in zip(result.get('numerPOdp'),result.get('trescOdp'),result.get('poprawna')):
-            Odpowiedz.objects.create(pytanie=Pytanie.objects.get(test=test.id,numer=nr), tresc=tr, czyPoprawna=pop, test=test)
-    else:
-        for nr, tr in zip(result.get('numerPOdp'),result.get('trescOdp')):
-            Odpowiedz.objects.create(pytanie=Pytanie.objects.get(test=test.id,numer=nr), tresc=tr, czyPoprawna=False, test=test)
+    getted = json.loads(request.body)
+    result = []
+    for entry in getted:
+        result.append({entry.get('name'):entry.get('value')})
+    test = Test.objects.create(tytul=result[0].get("test-title"), opis='done',owner="user",czasTrwania=34232,terminOtwarcia=datetime.now(),
+    terminZamkniecia=datetime.now())
+    test.save()
+    ###################
+    questionTitle = 'question-title'
+    checkbox = 'checkbox-answer[]'
+    answ = 'input-answer[]'
+    ###################
+    nrPytania = 0
+    czyPoprawnaOdp = False
+    for dict in result:
+        if questionTitle in dict.keys():
+            if dict.get(questionTitle) == '' or dict.get(questionTitle) == None:
+                continue
+            nrPytania+=1
+            Pytanie.objects.create(numer=nrPytania, tresc=dict.get(questionTitle), test=test)
+        elif checkbox in dict.keys():
+            czyPoprawnaOdp = True
+        elif answ in dict.keys():
+            if dict.get(answ) == '' or dict.get(answ) == None:
+                continue
+            Odpowiedz.objects.create(tresc=dict.get(answ), test=test, 
+            pytanie=Pytanie.objects.get(numer=nrPytania, test=test), czyPoprawna=czyPoprawnaOdp)
+            czyPoprawnaOdp = False
+
+    # for nr, tr, zam in zip(result.get('numerP'),result.get('trescPyt'),result.get('zamkniete')):
+    #     if Pytanie.objects.filter(test=test.id, numer=nr):
+    #         continue
+    #     Pytanie.objects.create(numer=nr, tresc=tr, zamkniete=zam, test=test)
+    # if result.get('poprawna', False):
+    #     for nr, tr, pop in zip(result.get('numerPOdp'),result.get('trescOdp'),result.get('poprawna')):
+    #         Odpowiedz.objects.create(pytanie=Pytanie.objects.get(test=test.id,numer=nr), tresc=tr, czyPoprawna=pop, test=test)
+    # else:
+    #     for nr, tr in zip(result.get('numerPOdp'),result.get('trescOdp')):
+    #         Odpowiedz.objects.create(pytanie=Pytanie.objects.get(test=test.id,numer=nr), tresc=tr, czyPoprawna=False, test=test)
     return Response(status=status.HTTP_201_CREATED)
+
+
+
+@api_view(['GET'])
+def getWynik(request, nickname, testid):
+    test = Test.objects.get(id=testid)
+    pkt = 0
+    max = 0
+    for roz in Rozwiazanie.objects.filter(test=testid, ktoRozwiazal=nickname):
+        try:
+            if Odpowiedz.objects.get(pytanie=roz.pytanie, czyPoprawna=True).tresc == roz.odpowiedz:
+                pkt+=1
+        except:
+            pass
+        max+=1
+    return JsonResponse({"wynik":pkt,"maxWynik":max}, status=status.HTTP_200_OK)
 
 
 @api_view(['POST'])
@@ -310,12 +350,16 @@ def addRozwiazanie(request):
     result = json.loads(request.body)
     test = Test.objects.get(id=result.get('test'))
     kto = result.get('ktoRozwiazal')
+    pkt = 0
+    max = 0
     if isinstance(result.get('pytanie'), int):
+        pyt=result.get('pytanie')
         Rozwiazanie.objects.create(ktoRozwiazal=result.get('ktoRozwiazal'), 
         odpowiedz=result.get('odpowiedz'), test=test,
-        pytanie=Pytanie.objects.get(numer=result.get('pytanie'), test=test))
+        pytanie=Pytanie.objects.get(numer=pyt, test=test))
         return Response(status=status.HTTP_201_CREATED)
     for odp, pyt in zip(result.get('odpowiedz'),result.get('pytanie')):
+        pytanie = Pytanie.objects.get(numer=pyt, test=test)
         Rozwiazanie.objects.create(ktoRozwiazal=kto, odpowiedz=odp, test=test,
-        pytanie=Pytanie.objects.get(numer=pyt, test=test))
+        pytanie=pytanie)
     return Response(status=status.HTTP_201_CREATED)

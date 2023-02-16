@@ -28,6 +28,7 @@ urlpatterns = [
     path('detailAnswear/<int:answId>', views.detailAnswear),
     path('detailPytanie/<int:pytanie>', views.detailPytanie),
     path('detailOdp/<int:odp>', views.detailOdp),
+    path('getWynik/<str:nickname>/<int:testid>', views.getWynik),
 ]
 
 urlpatterns = format_suffix_patterns(urlpatterns)

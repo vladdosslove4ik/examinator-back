@@ -8,7 +8,7 @@ import json
 class AddOthersTestCase(APITestCase):
 
     def setUp(self):
-        data = {"tytul":"s","opis":"s","owner":"test","czasTrwania":1,
+        data = {"test-title":"s","opis":"s","owner":"test","czasTrwania":1,
         "terminOtwarcia":datetime.now(),"terminZamkniecia":datetime.now()}
         response = self.client.post("/addTest/", data)
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
@@ -24,6 +24,7 @@ class AddOthersTestCase(APITestCase):
                                 content_type="application/json")
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
+
     def test_addOdp(self):
         data = {"czyPoprawna":True,"tresc":"s","pytanie":1,"test":1}
         response = self.client.post("/addOdp/", data)
@@ -34,7 +35,7 @@ class AddOthersTestCase(APITestCase):
 class AddPytanieTest(APITestCase):
 
     def setUp(self):
-        data = {"tytul":"s","opis":"s","owner":"test","czasTrwania":1,
+        data = {"test-title":"s","opis":"s","owner":"test","czasTrwania":1,
         "terminOtwarcia":datetime.now(),"terminZamkniecia":datetime.now()}
         response = self.client.post("/addTest/", data)
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
@@ -49,7 +50,13 @@ class AddPytanieTest(APITestCase):
 class AddTestCase(APITestCase):
 
     def test_addTest(self):
-        data = {"tytul":"s","opis":"s","owner":"badanie","czasTrwania":1,
+        data = {"test-title":"s","opis":"s","owner":"badanie","czasTrwania":1,
+        "terminOtwarcia":datetime.now(),"terminZamkniecia":datetime.now()}
+        response = self.client.post("/addTest/", data)
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+    def test_addTestV(self):
+        data = {"test-title":"double","opis":"s","owner":"badanie","czasTrwania":1,
         "terminOtwarcia":datetime.now(),"terminZamkniecia":datetime.now()}
         response = self.client.post("/addTest/", data)
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
@@ -61,7 +68,7 @@ class AddTestCase(APITestCase):
 
 class GetsAndUpdatesTestCase(APITestCase):
     def setUp(self):
-        data = {"tytul":"s","opis":"s","owner":"test","czasTrwania":1,
+        data = {"test-title":"s","opis":"s","owner":"test","czasTrwania":1,
         "terminOtwarcia":datetime.now(),"terminZamkniecia":datetime.now()}
         response = self.client.post("/addTest/", data)
         data = {"numer":1,"tresc":"s","zamkniete":True,"test":1}
@@ -159,7 +166,7 @@ class GetsAndUpdatesTestCase(APITestCase):
 ##########################################################################
 class UpdateTestCase(APITestCase):
     def setUp(self):
-        data = {"tytul":"s","opis":"s","owner":"test","czasTrwania":1,
+        data = {"test-title":"s","opis":"s","owner":"test","czasTrwania":1,
         "terminOtwarcia":datetime.now(),"terminZamkniecia":datetime.now()}
         response = self.client.post("/addTest/", data)
         data = {"numer":1,"tresc":"s","zamkniete":True,"test":1}
@@ -172,7 +179,7 @@ class UpdateTestCase(APITestCase):
 
 
     def test_detailTest(self):
-        data = {"tytul":"22s","opis":"123124124s","owner":"test","czasTrwania":1,
+        data = {"test-title":"22s","opis":"123124124s","owner":"test","czasTrwania":1,
         "terminOtwarcia":datetime.now(),"terminZamkniecia":datetime.now()}
         response = self.client.post("/detailTest/1", data)
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
@@ -198,7 +205,7 @@ class UpdateTestCase(APITestCase):
 
 class DeleteOthersTestCase(APITestCase):
     def setUp(self):
-        data = {"tytul":"s","opis":"s","owner":"test","czasTrwania":1,
+        data = {"test-title":"s","opis":"s","owner":"test","czasTrwania":1,
         "terminOtwarcia":datetime.now(),"terminZamkniecia":datetime.now()}
         response = self.client.post("/addTest/", data)
         data = {"numer":1,"tresc":"s","zamkniete":True,"test":1}
@@ -222,7 +229,7 @@ class DeleteOthersTestCase(APITestCase):
 
 class DeletePytanieTestCase(APITestCase):
     def setUp(self):
-        data = {"tytul":"s","opis":"s","owner":"test","czasTrwania":1,
+        data = {"test-title":"s","opis":"s","owner":"test","czasTrwania":1,
         "terminOtwarcia":datetime.now(),"terminZamkniecia":datetime.now()}
         response = self.client.post("/addTest/", data)
         data = {"numer":1,"tresc":"s","zamkniete":True,"test":1}
@@ -235,7 +242,7 @@ class DeletePytanieTestCase(APITestCase):
 
 class DeleteFormsTestCase(APITestCase):
     def setUp(self):
-        data = {"tytul":"s","opis":"s","owner":"test","czasTrwania":1,
+        data = {"test-title":"s","opis":"s","owner":"test","czasTrwania":1,
         "terminOtwarcia":datetime.now(),"terminZamkniecia":datetime.now()}
         response = self.client.post("/addTest/", data)
 
